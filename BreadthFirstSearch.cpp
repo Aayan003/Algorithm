@@ -137,7 +137,7 @@ int main()
     cout << "Enter the starting node: ";
     cin >> start;
     cout << "\nBFS Traversal:\n";
-    BFS(vertex, start);
+    BFS(vertex, start - 1);
     cout << "\nColour array: ";
     for (int i = 0; i < vertex; ++i)
     {

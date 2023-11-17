@@ -181,7 +181,7 @@ public:
 
     int MST_Krushkal(int num, Graph last[MAX][MAX])
     {
-        int wg = 0; // Initialize wg
+        int wg = 0;
         for (int i = 0; i < num; ++i)
             Makeset(i);
 

@@ -35,10 +35,8 @@ class BellManFord
         bool checkifpath(int s)
         {
             InitSingleSource(s);
-            bool check;
             for(int k = 0; k < *vernum - 1; ++k)
             {
-                check = true;
                 for(int i = 0; i < *vernum; ++i)
                 {
                     for(int j = 0; j < *vernum; ++j)

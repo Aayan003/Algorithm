@@ -52,13 +52,10 @@ cd* FFT(const cd* S, int N, bool inverse) {
 class Polynomial {
 private:
     cd* coefficient;
-    int lim;
+    int limit;
 
 public:
-    Polynomial(int limit){
-        lim = limit;
-        coefficient = new cd[limit];
-    }
+    Polynomial(int lim) : limit(lim), coefficient(new cd[lim]) {}
 
     ~Polynomial() {
         delete[] coefficient;
@@ -74,7 +71,7 @@ public:
     
     friend ostream& operator<<(ostream& os, const Polynomial& obj);
     friend istream& operator>>(istream& is, Polynomial& obj){
-    for (int i = 0; i < obj.lim; ++i) {
+    for (int i = 0; i < obj.limit; ++i) {
             int coeff;
             cout << "Enter coefficient of x^" << i << ": ";
             is >> coeff;
@@ -85,7 +82,7 @@ public:
 };
 
 int Polynomial :: operator()(int x)const{
-            int i = lim;
+            int i = limit;
             int p = coefficient[i].real();
             while(i >= 1){
                 p = p * x + coefficient[--i].real();
@@ -94,7 +91,7 @@ int Polynomial :: operator()(int x)const{
         }
 
 Polynomial Polynomial :: operator*(const Polynomial& other) const {
-        int max =  lim + other.lim;
+        int max =  limit + other.limit;
         if ((log(max) / log(2) - (int)(log(max) / log(2))) > 0.0) {
             int temp = log(max) / log(2);
             max = 2;
@@ -102,7 +99,7 @@ Polynomial Polynomial :: operator*(const Polynomial& other) const {
         }
         cd *fA = new cd[max];
         for(int i = 0; i < max; ++i){
-            if(i < lim)
+            if(i < limit)
                 fA[i] = coefficient[i];
             else
                 fA[i] = {0.0, 0.0};
@@ -111,7 +108,7 @@ Polynomial Polynomial :: operator*(const Polynomial& other) const {
         cd* fB = new cd[max];
 
         for(int i = 0; i < max; ++i){
-            if(i < other.lim)
+            if(i < other.limit)
                 fB[i] = other.coefficient[i];
             else
                 fB[i] = {0.0, 0.0};
@@ -125,7 +122,7 @@ Polynomial Polynomial :: operator*(const Polynomial& other) const {
         fA = FFT(fA, max, true);
 
         Polynomial result(max);
-        for (int i = 0; i < result.lim; ++i) {
+        for (int i = 0; i < result.limit; ++i) {
             result.coefficient[i] = fA[i];
         }
         delete[] fA;
@@ -135,7 +132,7 @@ Polynomial Polynomial :: operator*(const Polynomial& other) const {
 
 ostream& operator<<(ostream& os, const Polynomial& obj) {
     bool flag = false;
-    int i = obj.lim - 1;
+    int i = obj.limit - 1;
     while((int)obj[i].real() == 0)
         --i;
     while(i >= 0) {

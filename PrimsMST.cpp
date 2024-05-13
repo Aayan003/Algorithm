@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <limits>
 
@@ -11,11 +12,11 @@ class Element
         int vertices, key;
 };
 
-class Graph
-{
-    public:
-        int weight = numeric_limits<int>::max(), flag = 0;
-};
+// class Graph
+// {
+//     public:
+//         int weight = numeric_limits<int>::max(), flag = 0;
+// };
 
 class Queue
 {
@@ -23,7 +24,36 @@ class Queue
         Element item[MAX];
         int rear;
 
-        void swap(Element *num_1, Element *num_2)
+        inline void swap(Element *num_1, Element *num_2);
+
+        void minHeapify();
+    public:
+        Queue() : rear(-1){};
+
+        inline int isFull()
+        {
+            return (rear == MAX - 1);
+        }
+
+        inline int isEmpty()
+        {
+            return (rear == -1);
+        }
+
+        void buildMinHeap(int c);
+        void pri_enqueue(Element x);
+
+        Element del();
+        
+        void decreaseKey(int vertices, int num, int key);
+
+        inline Element top()
+        {
+            return item[0];
+        }
+};
+
+inline void Queue :: swap(Element *num_1, Element *num_2)
         {
             Element temp;
             temp = *num_1;
@@ -31,7 +61,7 @@ class Queue
             *num_2 = temp;
         }
 
-        void minHeapify()
+void Queue :: minHeapify()
         {
             if(!isEmpty())
             {
@@ -56,23 +86,7 @@ class Queue
                 }while(p <= rear);
             }
         }
-    public:
-        Queue()
-        {
-            rear = -1;
-        }
-
-        int isFull()
-        {
-            return (rear == MAX - 1);
-        }
-
-        int isEmpty()
-        {
-            return (rear == -1);
-        }
-
-        void buildMinHeap(int c)
+void Queue :: buildMinHeap(int c)
         {
             if(c == 0)
                 return;
@@ -83,7 +97,7 @@ class Queue
                 buildMinHeap(f);
             }
         }
-        void pri_enqueue(Element x)
+void Queue :: pri_enqueue(Element x)
         {
             if (!isFull())
             {
@@ -94,8 +108,7 @@ class Queue
             else
                 return;
         }
-
-        Element del()
+Element Queue :: del()
         {
             if (!isEmpty())
             {
@@ -106,8 +119,8 @@ class Queue
                 return z;
             }
         }
-        
-        void decreaseKey(int vertices, int num, int key)
+
+void Queue :: decreaseKey(int vertices, int num, int key)
         {
             int i;
             for(i=0; i < num; i++)
@@ -119,52 +132,75 @@ class Queue
             buildMinHeap(i);
         }
 
-        Element top()
-        {
-            return item[0];
-        }
-};
-
-class PrimS
+class Graph
 {
     private:
-        Graph **A;
+        int **A;
         Queue q;
-        int parent[MAX];
+        int parent[MAX], vCount, eCount;
         
     public:
-        PrimS(int num)
-        {
-            A = new Graph *[MAX];
-            for (int i = 0; i < MAX; ++i)
+        Graph(int num, int ed);
+        int MST_Prims(int num, int r, int last[MAX][MAX]);
+        //friend ostream& operator<<(ostream& os, const Graph obj);
+        friend istream& operator>>(istream& is, Graph& obj) {
+            for (int i = 0; i < obj.eCount; ++i)
             {
-                A[i] = new Graph[MAX];
+                int u, v, wg;
+                cout << "Edge between u & v vertices:\n";
+                cout << "u: ";
+                is >> u;
+                cout << "v: ";
+                is >> v;
+                cout << "Weight: ";
+                is >> wg;
+                obj.A[v-1][u-1] = obj.A[u-1][v-1] = wg;
             }
-            for (int i = 0; i < num; ++i)
-            {
-                for (int j = 0; j < num; j++)
-                {
-                    A[i][j].flag = 0;
-                    A[i][j].weight = numeric_limits<int>::max();
-                }
-            }
+            return is;
         }
-        ~PrimS()   
+        ~Graph();
+};
+
+
+
+// ostream& operator<<(ostream& os, const Graph obj) {
+//     for(int i = 0; i < obj.lim; ++i) {
+//         for(int j = 0; j < obj.lim; ++j) {
+//             if(i > j / 2 && obj)
+//         }
+//     }
+// }
+
+Graph :: ~Graph()   
         {
-            for(int i = 0; i < MAX; ++i)
+            for(int i = 0; i < vCount; ++i)
             {
                 delete[] A[i];
             }
             delete[] A;
         }
-        void adjacency(int u, int v, int wg)
+
+Graph :: Graph(int num, int ed)
         {
-            A[v][u].flag = A[u][v].flag = 1;
-            A[v][u].weight = A[u][v].weight = wg;
+            vCount = num;
+            eCount = ed;
+            A = new int *[vCount];
+            for (int i = 0; i < vCount; ++i)
+            {
+                A[i] = new int[vCount];
+            }
+            for (int i = 0; i < vCount; ++i)
+            {
+                for (int j = 0; j < vCount; j++)
+                {
+                    //A[i][j] = 0;
+                    A[i][j] = numeric_limits<int>::max();
+                }
+            }
         }
 
-        int MST_Prims(int num, int r, Graph last[MAX][MAX]) // I am using graph last for any future use of the MST
-        {                                                   //You can delete graph last
+int Graph :: MST_Prims(int num, int r, int last[MAX][MAX]) // I am using graph last for any future use of the MST
+        {                                      //You can delete graph last
             int key[MAX];
             bool mstflag[MAX] = {true};
             for(int i = 0; i < num; ++i)
@@ -185,10 +221,10 @@ class PrimS
                 int i;
                 for(i = 0; i < num; ++i)
                 {
-                    if(mstflag[i] == false && key[i] > A[X.vertices][i].weight)
+                    //cout << "Vertex!!: " << A[X.vertices][i] << endl;
+                    if(mstflag[i] == false && key[i] > A[X.vertices][i])
                     {
-                        last[X.vertices][i].weight = key[i] = A[X.vertices][i].weight;
-                        last[X.vertices][i].flag = 1;
+                        last[X.vertices][i] = key[i] = A[X.vertices][i];
                         parent[i] = X.vertices;
                         q.decreaseKey(i, num, key[i]);
                     }
@@ -198,33 +234,22 @@ class PrimS
             }
             return weightTotal;
         }
-};
 
 int main()
 {
     int ver = 9, edge = 14;
-    Graph G[MAX][MAX];
+    //Graph G[MAX][MAX];
+    int arr[MAX][MAX];
     cout << "Enter numbers of vertices: ";
     cin >> ver;
     cout << "Enter numbers of Edges: ";
     cin >> edge;
-    PrimS pm(ver);
-    for (int i = 0; i < edge; ++i)
-    {
-        int u, v, wg;
-        cout << "Edge between u & v vertices:\n";
-        cout << "u: ";
-        cin >> u;
-        cout << "v: ";
-        cin >> v;
-        cout << "Weight: ";
-        cin >> wg;
-        pm.adjacency(u - 1, v - 1, wg);
-    }
+    Graph pm(ver, edge);
+    cin >> pm;
     int source;
     cout << "Enter the source vertices: ";
     cin >> source;
-    int weight = pm.MST_Prims(ver, source - 1, G);
+    int weight = pm.MST_Prims(ver, source - 1, arr);
     cout << "\nWeight of the Minimum Spanning Tree: " << weight << endl;
     return 0;
 }

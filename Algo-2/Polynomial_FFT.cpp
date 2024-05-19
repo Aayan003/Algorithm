@@ -137,7 +137,14 @@ Polynomial Polynomial :: operator*(const Polynomial& obj) {
 	Polynomial result(k);
 	for(int i = k; i >= 0; --i)
 		result.coeff[i] = re[i].real();
-		
+	
+	delete[] A;
+	delete[] fA;
+	delete[] B;
+	delete[] fB;
+	delete[] re;
+
+
 	return result;
 }
 

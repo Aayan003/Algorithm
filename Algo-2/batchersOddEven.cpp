@@ -1,167 +1,148 @@
-#include <iostream>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-class batchers
-{
-	public:
-		int *sort(int arr[],int l,int n);
-		int *merge(int u[],int v[],int m,int n);
-		void compare_interchange(int &u,int &v);
-};
+#define MAX 100
 
-void batchers::compare_interchange(int &u,int &v)
-{
-	if(u>v)
-	{
-		int temp=u;
-		u=v;
-		v=temp;
+void cChange(int &a, int &b) {
+	if(a > b) {
+		int temp = a;
+		a = b;
+		b = temp;
 	}
 }
 
-int* batchers::merge(int u[],int v[],int m,int n)
-{
-	int *s;
-	int x,y,c;
-	if(m==0)
-	{
-		s=new int;
-		s[0]=v[0];
+int* batchers(int *u, int m, int *v, int n) {
+	int *s = new int[m + n];
+	if (m == 0) {
+        for (int i = 0; i < n; ++i) { 
+            s[i] = v[i];
+        }
+    } else if (n == 0) {
+        for (int i = 0; i < m; ++i) {  
+            s[i] = u[i];
+        }
+    }
+	else if(m == 1 && n == 1) {
+		cChange(u[0], v[0]);
+		s[0] = u[0];
+		s[1] = v[0];
 	}
-	else if(n==0)
-	{
-		s=new int;
-		s[0]=u[0];
-	}
-	else if(m==1 && n==1)
-	{
-		compare_interchange(u[0],v[0]);
-		s=new int[2];
-		s[0]=u[0];
-		s[1]=v[0];
-	}
-	else
-	{
-		if(m%2==1)
-			x=m/2+1;
+	else {
+		int x, y;
+		if(m % 2 == 1)
+			x = m / 2 + 1;
 		else
-			x=m/2;
-		if(n%2==1)
-			y=n/2+1;
+			x = m / 2;
+		if(n % 2 == 1)
+			y = n / 2 + 1;
 		else
-			y=n/2;		
-		int *ou=new int[x];
-		int *ov=new int[y];
-		for(int i=0,j=0;i<m;i+=2,j++)
-		{
-			ou[j]=u[i];
+			y = n / 2;
+		
+		int *Ou = new int[x];
+		int *Eu = new int[m / 2];
+		
+		for(int i = 0, j = 0; i < m; i += 2, j++) {
+			Ou[j] = u[i];
 		}
-		for(int i=0,j=0;i<n;i+=2,j++)
-		{
-			ov[j]=v[i];
+		for(int i = 1, j = 0; i < m; i += 2, j++) {
+			Eu[j] = u[i];
 		}
-		int *a=merge(ou,ov,x,y);
-		int *eu=new int[m/2];
-		int *ev=new int[n/2];
-		for(int i=1,j=0;i<m;i+=2,j++)
-		{
-			eu[j]=u[i];
+		int *Ov = new int[y];
+		int *Ev = new int[n / 2];
+		
+		for(int i = 0, j = 0; i < n; i += 2, j++) {
+			Ov[j] = v[i];
 		}
-		for(int i=1,j=0;i<n;i+=2,j++)
-		{
-			ev[j]=v[i];
+		for(int i = 1, j = 0; i < n; i += 2, j++) {
+			Ev[j] = v[i];
 		}
-		int *b=merge(eu,ev,m/2,n/2);
-		if(m%2==0 && n%2==0)
-		{
-			c=m/2+n/2-1;
-		}
+		
+		int *a = batchers(Ou, x, Ov, y);
+		int *b = batchers(Eu, m / 2, Ev, n / 2);
+		int c = 0;
+		if(m % 2 == 0 && n % 2 == 0)
+			c = m / 2 + n / 2 - 1;
 		else
-		{
-			c=m/2+n/2;
+			c = m / 2 + n / 2;
+		
+		s[0] = a[0];
+		
+		for(int i = 1; i <= c; ++i) {
+			cChange(b[i - 1], a[i]);
 		}
-		for(int i=1;i<=c;i++)
-		{
-			compare_interchange(b[i-1],a[i]);
-		}
-		s=new int[m+n];
-		s[0]=a[0];
-		int j = 1;
-		for(int i=1;i<=c;i++)
-		{
-			s[j++]=b[i-1];
-			s[j++]=a[i];
-			if(m%2==0 && n%2==0)
-			{
-				s[j]=b[m/2+n/2-1];
+		for(int i = 1, j = 1; i <= c; ++i) {
+			s[j++] = b[i - 1];
+			s[j++] = a[i];
+			if(m % 2 == 1 && n % 2 == 1 && i == c) {
+				s[j++] = a[m / 2 + n / 2 + 1]; 
 			}
-			else if(m%2==1 && n%2==1)
-			{
-				s[j]=a[m/2+n/2+1];
+			else if(m % 2 == 0 && n % 2 == 0 && i == c) {
+				s[j++] = b[m / 2 + n / 2 - 1];
 			}
 		}
+		delete[] Ou;
+		delete[] Ov;
+		delete[] Eu;
+		delete[] Ev;
+		delete[] a;
+		delete[] b;
 	}
+	
+	return s;
+	
+}
+
+int* batchersSort(int *arr, int low, int num) {
+	if(num > 1) {
+		int m, n;
+		int mid = num/2;
+		m = mid;
+		n = num - mid;
+		int *u = new int[m];
+		int *v = new int[n];
+		for(int i = 0; i < m; ++i){
+			u[i] = arr[i];
+		}
+		
+		for(int i = 0; i < n; ++i) {
+			v[i] = arr[i + mid];
+		}
+		
+		
+		u = batchersSort(arr, low, mid);
+		v = batchersSort(arr, low + mid, n);
+		int *s = batchers(u, m, v, n);
+		delete[] u;
+		delete[] v;
+		
+		return s;
+	}
+	
+	int *s = new int[1];
+	s[0] = arr[low];
 	return s;
 }
 
-int* batchers::sort(int arr[],int lo,int no)
-{
-	int *s;
-	int m,n;
-	if(no>1)
-	{
-		int mid;
-		mid=no/2;
-		m=mid;
-		n=no-mid;
-		int *u=new int[m];
-		int *v=new int[n];
-		for(int i=0;i<m;i++)
-		{
-			u[i]=arr[i];
-		}
-		for(int i=0;i<n;i++)
-		{
-			v[i]=arr[mid+i];
-		}
-		u=sort(arr,lo,m);
-		v=sort(arr,lo+mid,n);
-		s=merge(u,v,m,n);
-		delete[] u;
-		delete[] v;
-		return s;	
+int main() {
+	int n = 14;
+	int *arr = new int[n];
+	for(int i = 0; i < n; ++i) {
+		arr[i] = rand() % n;
 	}
-	else
-	{
-		s=new int;
-		s[0]=arr[lo];
-		return s;
-	}
-}
-
-int main()
-{
-	int arr[100],n,low=0;
-	batchers b;
-	cout<<"Enter the number of elements in the array";
-	n = 23;
-	for(int i=0;i<n;i++)
-	{
-		arr[i] = n-i;
+	
+	cout << "Intitial array: ";
+	for(int i = 0; i < n; ++i) {
+		cout << arr[i] << " ";
 	}
 	cout << endl;
-	for(int i=0;i<n;i++)
-	{
-		cout<<arr[i] << " ";
-	}
-	int *p=b.sort(arr,low,n);
-	cout<<"\nThe sorted array :\n";
-	for(int i=0;i<n;i++)
-	{
-		cout<<p[i]<< " ";
+	int *sorted = new int[n];
+	sorted = batchersSort(arr, 0, n);
+	cout << "Sorted array: ";
+	for(int i = 0; i < n; ++i) {
+		cout << sorted[i] << " ";
 	}
 	cout << endl;
-	delete[] p;
+	
 	return 0;
 }
